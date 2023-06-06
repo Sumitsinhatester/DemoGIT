@@ -2,6 +2,7 @@
 
 let server = require('supertest').agent('https://reqres.in');
 let chai = require('chai'); // This is assertion library of nodejs
+const { SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS } = require('constants');
 const { it, default: test, default: nodeTest } = require('node:test');
 
 
@@ -10,7 +11,7 @@ describe('This is login Suite', function () {
 
 
     // This is it() block to add test case
-    @test
+    @nodeTest
     it('1. Verify when pass Valid Email and Password, it should login the user', function (done) {
         server
             .post('/api/login')     // This is method and route of request
@@ -92,7 +93,7 @@ describe('This is login Suite', function () {
                 }
             })
     })
-    @test
+    @nodeTest
     it('5. verify when pass invalid Email id and pass invalid password, it should throw an error message for invalid Email id and Invalid password', function (done) {
         server
             .post('/api/login')
@@ -112,6 +113,7 @@ describe('This is login Suite', function () {
                 }
             })
     })
+    @nodeTest
     it('6. verify when pass valid Email id and pass valid password, it should throw a message about successful login and Go to the dashboard');
     server
         .post('/api/login')
@@ -129,7 +131,7 @@ describe('This is login Suite', function () {
                 done()
             }
         })
-    
+    @nodeTest
     it('7. verify when Email id is invalid, and password is also invalid');
     server
         .post('/api/login')
@@ -142,5 +144,20 @@ describe('This is login Suite', function () {
                 chai.expect(res.body).to.have.property('message', 'Your Email id is invalid and Your password is also invalid');
                 done()
             }
+
+            @nodeTest
+            it('8. verify when Email id is valid, and password is also valid');
+            server
+                .post('/api/login')
+                .set('accept', 'json')
+                .send({ "email": "eve.holt@reqres.in", "password": "6666666666" })
+                .end(function (err, res) {
+                    if (err) throw err;
+                    else {
+                        console.log("This is not a token", res.body);
+                        chai.expect(res.body).to.have.property('message', 'Your Email id is valid and Your password is valid');
+                        done()
+                    }
+                })
 });
 
